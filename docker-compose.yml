@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  backend:
+    build: .
+    ports:
+      - "5001:5000"
+
+  ollama:
+    image: ollama/ollama
+    ports:
+      - "11434:11434"
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_PASSWORD: mysecretpassword
