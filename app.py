@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+import html
 import requests
 import psycopg2
 import os
@@ -141,7 +142,7 @@ def soc_dashboard():
         html_content += '<tr><td colspan="4" style="text-align: center; color: #94a3b8;">Henüz kayıtlı bir güvenlik ihlali bulunmuyor.</td></tr>'
     else:
         for log in logs:
-            html_content += f'<tr><td>{log[0]}</td><td>{log[1]}</td><td>{log[2]}</td><td><span class="badge">{log[3]}</span></td></tr>'
+            html_content += f'<tr><td>{log[0]}</td><td>{log[1]}</td><td>{html.escape(str(log[2]))}</td><td><span class="badge">{html.escape(str(log[3]))}</span></td></tr>'
         
     html_content += "</table></body></html>"
     return html_content
