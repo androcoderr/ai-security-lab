@@ -101,7 +101,7 @@ def soc_dashboard():
     try:
         conn = psycopg2.connect(host=DB_HOST, user=DB_USER, password=DB_PASS, dbname=DB_NAME)
         cur = conn.cursor()
-        cur.execute('SELECT id, timestamp, user_prompt, threat_type FROM security_logs ORDER BY timestamp DESC LIMIT 20;')
+        cur.execute("SELECT id, TO_CHAR(timestamp, 'YYYY-MM-DD HH24:MI:SS'), user_prompt, threat_type FROM security_logs ORDER BY timestamp DESC LIMIT 20;")
         logs = cur.fetchall()
         cur.close()
         conn.close()
