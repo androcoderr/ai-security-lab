@@ -68,10 +68,14 @@ def detect_prompt_injection(text):
     """Basit anahtar kelime bazli prompt injection tespiti (ilk savunma katmani)"""
     suspicious_patterns = [
         "ignore previous instructions", "ignore all previous",
-        "you are now", "you are dan", "artik dan",
-        "onceki talimatlari unut", "onceki tum talimatlari",
-        "kural tanimayan", "kisitlaman yok", "sistem promptunu",
-        "act as", "pretend you are", "jailbreak"
+        "you are now", "you are dan", "artik dan", "artık dan",
+        "onceki talimatlari unut", "önceki talimatları unut",
+        "onceki tum talimatlari", "önceki tüm talimatları",
+        "kural tanimayan", "kural tanımayan",
+        "kisitlaman yok", "kısıtlaman yok",
+        "sistem promptunu", "sistem talimatını",
+        "act as", "pretend you are", "jailbreak",
+        "hicbir kural", "hiçbir kural", "kurallara uymuyorsun"
     ]
     text_lower = text.lower()
     return any(pattern in text_lower for pattern in suspicious_patterns)
