@@ -63,6 +63,19 @@ def detect_pii(text):
     results = analyzer.analyze(text=text, entities=["CREDIT_CARD", "PHONE_NUMBER", "EMAIL_ADDRESS", "IBAN_CODE"], language='en')
     return results
 
+
+def detect_prompt_injection(text):
+    """Basit anahtar kelime bazli prompt injection tespiti (ilk savunma katmani)"""
+    suspicious_patterns = [
+        "ignore previous instructions", "ignore all previous",
+        "you are now", "you are dan", "artik dan",
+        "onceki talimatlari unut", "onceki tum talimatlari",
+        "kural tanimayan", "kisitlaman yok", "sistem promptunu",
+        "act as", "pretend you are", "jailbreak"
+    ]
+    text_lower = text.lower()
+    return any(pattern in text_lower for pattern in suspicious_patterns)
+
 @app.route('/api/chat', methods=['POST'])
 def chat():
     client_ip = request.remote_addr
@@ -76,6 +89,10 @@ def chat():
         detected_entities = [res.entity_type for res in pii_results]
         log_to_db(user_message, "Blocked by Presidio DLP", f"PII Leak Attempt: {', '.join(detected_entities)}")
         return jsonify({"reply": f"🛡️ DLP UYARISI: Mesajınızda hassas veri tespit edildi! Algılanan: {', '.join(detected_entities)}"}), 400
+
+    if detect_prompt_injection(user_message):
+        log_to_db(user_message, "Blocked before reaching model", "Prompt Injection Attempt")
+        return jsonify({"reply": "🛡️ GÜVENLİK UYARISI: Şüpheli talimat değiştirme girişimi tespit edildi ve engellendi."}), 400
 
     ollama_payload = {
         "model": "llama3",
