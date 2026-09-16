@@ -1,22 +1,61 @@
 version: '3.8'
 
 services:
-  backend:
-    build: .
-    ports:
-      - "5001:5000"
-
-  ollama:
-    image: ollama/ollama
-    ports:
-      - "11434:11434"
-
-  redis:
-    image: redis:alpine
-    ports:
-      - "6379:6379"
-
   db:
     image: postgres:13
+    container_name: hacker-lab-db
     environment:
+      POSTGRES_USER: postgres
       POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - lab-net
+
+  redis:
+    image: redis/redis-stack:latest
+    container_name: hacker-lab-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - lab-net
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: hacker-lab-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - lab-net
+
+  backend:
+    build: .
+    container_name: hacker-lab-backend
+    ports:
+      - "5001:5000"
+    environment:
+      - DB_HOST=db
+      - DB_USER=postgres
+      - DB_PASS=mysecretpassword
+      - DB_NAME=postgres
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - db
+      - redis
+      - ollama
+    networks:
+      - lab-net
+
+volumes:
+  postgres_data:
+  ollama_data:
+
+networks:
+  lab-net:
+    driver: bridge
