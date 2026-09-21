@@ -131,6 +131,17 @@ def chat():
             log_to_db(user_message, raw_ai_response, "AI Output PII Leak Prevented")
             raw_ai_response = "🛡️ DLP Kalkanı: Yapay zekanın ürettiği yanıt hassas veri içerdiği için engellendi."
 
+        system_prompt_fragments = [
+            "secure AI assistant",
+            "You must follow these rules",
+            "SENSITIVE DATA",
+            "INSTRUCTION OVERRIDE",
+            "SUSPICIOUS REQUESTS"
+        ]
+        if any(fragment in raw_ai_response for fragment in system_prompt_fragments):
+            log_to_db(user_message, raw_ai_response, "System Prompt Leakage Attempt Blocked")
+            raw_ai_response = "🛡️ GÜVENLİK UYARISI: Bu bilgi paylaşılamaz."
+
         return jsonify({"reply": raw_ai_response})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
