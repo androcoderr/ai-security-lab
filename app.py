@@ -88,6 +88,9 @@ def chat():
 
     user_message = request.json.get("message", "")
 
+    if len(user_message) > 2000:
+        return jsonify({"reply": "⚠️ Mesaj çok uzun. Lütfen 2000 karakterin altında bir mesaj gönderin."}), 400
+
     pii_results = detect_pii(user_message)
     if pii_results:
         detected_entities = [res.entity_type for res in pii_results]
