@@ -1,0 +1,28 @@
+ACME Corp Security Policy v2.1
+
+1. PASSWORD POLICY
+All employees must use passwords with minimum 12 characters.
+Passwords must include uppercase, lowercase, numbers and special characters.
+Passwords must be changed every 90 days.
+Multi-factor authentication is mandatory for all systems.
+
+2. DATA CLASSIFICATION
+Public: Marketing materials, press releases
+Internal: Employee directories, project plans
+Confidential: Customer data, financial records
+Secret: Encryption keys, system credentials
+
+3. INCIDENT RESPONSE
+Security incidents must be reported to security@acmecorp.com within 1 hour.
+All incidents are logged in the SIEM system.
+Critical incidents require immediate escalation to the CISO.
+
+4. ACCESS CONTROL
+Principle of least privilege applies to all user accounts.
+Access reviews are conducted quarterly.
+Terminated employee accounts must be disabled within 24 hours.
+
+5. ACCEPTABLE USE
+Company systems must not be used for personal business.
+Downloading unauthorized software is prohibited.
+All data transfers must use encrypted channels.

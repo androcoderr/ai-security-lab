@@ -14,6 +14,7 @@ SYSTEM_PROMPT = """You are a secure AI assistant. You must follow these rules st
 
 from flask import Flask, request, jsonify
 import html
+from rag import retrieve, load_text_document, get_collection_info
 import requests
 import psycopg2
 import os
@@ -196,6 +197,21 @@ def soc_dashboard():
         
     html_content += "</table></body></html>"
     return html_content
+
+@app.route('/api/rag/load', methods=['POST'])
+def rag_load():
+    data = request.json
+    file_path = data.get('file_path', '')
+    doc_id = data.get('doc_id', '')
+    
+    if not file_path or not doc_id:
+        return jsonify({"error": "file_path ve doc_id gerekli"}), 400
+    
+    if not os.path.exists(file_path):
+        return jsonify({"error": f"Dosya bulunamadı: {file_path}"}), 404
+    
+    chunks = load_text_document(file_path, doc_id)
+    return jsonify({"success": True, "chunks_loaded": chunks, "doc_id": doc_id})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
