@@ -75,7 +75,12 @@ def log_to_db(user_message, ai_response, threat_type):
         print(f"Veritabanı Loglama Hatası: {e}", flush=True)
 
 def detect_pii(text):
-    results = analyzer.analyze(text=text, entities=["CREDIT_CARD", "PHONE_NUMBER", "EMAIL_ADDRESS", "IBAN_CODE", "PERSON", "LOCATION", "DATE_TIME"], language='en')
+    results = analyzer.analyze(
+        text=text,
+        entities=["CREDIT_CARD", "PHONE_NUMBER", "EMAIL_ADDRESS", "IBAN_CODE", "PERSON", "LOCATION", "DATE_TIME"],
+        language='en',
+        score_threshold=0.85
+    )
     return results
 
 
