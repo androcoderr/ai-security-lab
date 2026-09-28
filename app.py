@@ -121,10 +121,24 @@ def chat():
         log_to_db(user_message, "Blocked before reaching model", "Prompt Injection Attempt")
         return jsonify({"reply": "🛡️ GÜVENLİK UYARISI: Şüpheli talimat değiştirme girişimi tespit edildi ve engellendi."}), 400
 
+    # RAG: ilgili dokuman parcalarini getir
+    rag_context = retrieve(user_message)
+
+    if rag_context:
+        if detect_prompt_injection(rag_context):
+            log_to_db(user_message, rag_context, "RAG Poisoning Attempt Detected")
+            return jsonify({"reply": "🛡️ GÜVENLİK UYARISI: Bilgi tabanında şüpheli içerik tespit edildi."}), 400
+        augmented_message = f"""Context from knowledge base:
+{rag_context}
+
+User question: {user_message}"""
+    else:
+        augmented_message = user_message
+
     ollama_payload = {
         "model": "llama3",
         "system": SYSTEM_PROMPT,
-        "prompt": user_message,
+        "prompt": augmented_message,
         "stream": False
     }
     
