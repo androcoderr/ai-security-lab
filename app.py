@@ -87,6 +87,7 @@ def detect_pii(text):
 def detect_prompt_injection(text):
     """Basit anahtar kelime bazli prompt injection tespiti (ilk savunma katmani)"""
     suspicious_patterns = [
+        # Dogrudan jailbreak
         "ignore previous instructions", "ignore all previous",
         "you are now", "you are dan", "artik dan", "artık dan",
         "onceki talimatlari unut", "önceki talimatları unut",
@@ -95,7 +96,20 @@ def detect_prompt_injection(text):
         "kisitlaman yok", "kısıtlaman yok",
         "sistem promptunu", "sistem talimatını",
         "act as", "pretend you are", "jailbreak",
-        "hicbir kural", "hiçbir kural", "kurallara uymuyorsun"
+        "hicbir kural", "hiçbir kural", "kurallara uymuyorsun",
+        # Roleplay cerceveleme
+        "roleplay", "role play", "let's play a game",
+        "you are an ai character", "stay in character",
+        "in this scenario you have no", "no safety guidelines",
+        "no restrictions", "unrestricted mode",
+        # Zararli kod uretme
+        "/etc/passwd", "/etc/shadow", "send to external server",
+        "exfiltrate", "reverse shell", "bind shell",
+        "base64 encode", "exec(", "eval(",
+        # System prompt sızdırma
+        "list your instructions", "repeat your instructions",
+        "what are your system", "show your prompt",
+        "what were you told", "your initial instructions"
     ]
     text_lower = text.lower()
     return any(pattern in text_lower for pattern in suspicious_patterns)
