@@ -109,7 +109,11 @@ def detect_prompt_injection(text):
         # System prompt sızdırma
         "list your instructions", "repeat your instructions",
         "what are your system", "show your prompt",
-        "what were you told", "your initial instructions"
+        "what were you told", "your initial instructions",
+        # Exploit ve saldiri teknikleri
+        "exploit it", "how to exploit", "show me vulnerable",
+        "vulnerable code", "attack payload", "sql injection example",
+        "bypass authentication", "union select", "drop table"
     ]
     text_lower = text.lower()
     return any(pattern in text_lower for pattern in suspicious_patterns)
