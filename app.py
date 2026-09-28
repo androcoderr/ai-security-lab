@@ -1,3 +1,5 @@
+RAG_API_KEY = "rag-secret-key-2024"
+
 SYSTEM_PROMPT = """You are a secure AI assistant. You must follow these rules strictly:
 
 1. ROLE: You are a helpful assistant. You answer questions honestly and safely.
@@ -244,6 +246,11 @@ def soc_dashboard():
 
 @app.route('/api/rag/load', methods=['POST'])
 def rag_load():
+    # API key kontrolu
+    api_key = request.headers.get('X-API-Key', '')
+    if api_key != RAG_API_KEY:
+        return jsonify({"error": "Unauthorized — API key required"}), 401
+
     data = request.json
     file_path = data.get('file_path', '')
     doc_id = data.get('doc_id', '')
