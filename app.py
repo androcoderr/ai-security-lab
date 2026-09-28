@@ -128,6 +128,13 @@ def chat():
         if detect_prompt_injection(rag_context):
             log_to_db(user_message, rag_context, "RAG Poisoning Attempt Detected")
             return jsonify({"reply": "🛡️ GÜVENLİK UYARISI: Bilgi tabanında şüpheli içerik tespit edildi."}), 400
+        
+        # RAG context icindeki PII varsa maskele
+        rag_pii = detect_pii(rag_context)
+        if rag_pii:
+            for result in sorted(rag_pii, key=lambda x: x.start, reverse=True):
+                rag_context = rag_context[:result.start] + "[REDACTED]" + rag_context[result.end:]
+        
         augmented_message = f"""Context from knowledge base:
 {rag_context}
 
