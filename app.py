@@ -30,7 +30,7 @@ SYSTEM_PROMPT = """You are a secure AI assistant. You must follow these rules st
 
 6. LANGUAGE: You may respond in Turkish if the user writes in Turkish."""
 
-from flask import Flask, request, jsonify, Response
+from flask import Flask, request, jsonify, Response, Response, Response
 import html
 from functools import wraps
 from rag import retrieve, load_text_document, get_collection_info
