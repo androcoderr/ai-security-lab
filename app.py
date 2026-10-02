@@ -1,5 +1,21 @@
 RAG_API_KEY = "rag-secret-key-2024"
 
+DASHBOARD_USER = "admin"
+DASHBOARD_PASS = "soc-secure-2024"
+
+def require_auth(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        auth = request.authorization
+        if not auth or auth.username != DASHBOARD_USER or auth.password != DASHBOARD_PASS:
+            return Response(
+                "Kimlik dogrulama gerekli.",
+                401,
+                {"WWW-Authenticate": 'Basic realm="SOC Dashboard"'}
+            )
+        return f(*args, **kwargs)
+    return decorated
+
 SYSTEM_PROMPT = """You are a secure AI assistant. You must follow these rules strictly:
 
 1. ROLE: You are a helpful assistant. You answer questions honestly and safely.
@@ -16,6 +32,7 @@ SYSTEM_PROMPT = """You are a secure AI assistant. You must follow these rules st
 
 from flask import Flask, request, jsonify
 import html
+from functools import wraps
 from rag import retrieve, load_text_document, get_collection_info
 import requests
 import psycopg2
@@ -53,7 +70,7 @@ def check_rate_limit(identifier):
     except Exception:
         return True
 
-def log_to_db(user_message, ai_response, threat_type):
+def log_to_db(user_message, ai_response, threat_type, ip_address=None, user_agent=None, endpoint=None):
     try:
         conn = psycopg2.connect(host=DB_HOST, user=DB_USER, password=DB_PASS, dbname=DB_NAME)
         cur = conn.cursor()
@@ -67,9 +84,9 @@ def log_to_db(user_message, ai_response, threat_type):
             )
         ''')
         cur.execute('''
-            INSERT INTO security_logs (user_prompt, ai_raw_response, threat_type)
-            VALUES (%s, %s, %s)
-        ''', (user_message, ai_response, threat_type))
+            INSERT INTO security_logs (user_prompt, ai_raw_response, threat_type, ip_address, user_agent, endpoint)
+            VALUES (%s, %s, %s, %s, %s, %s)
+        ''', (user_message, ai_response, threat_type, ip_address, user_agent, endpoint))
         conn.commit()
         cur.close()
         conn.close()
@@ -123,6 +140,8 @@ def detect_prompt_injection(text):
 @app.route('/api/chat', methods=['POST'])
 def chat():
     client_ip = request.remote_addr
+    user_agent = request.headers.get('User-Agent', 'unknown')
+    endpoint = request.path
     if not check_rate_limit(client_ip):
         return jsonify({"reply": "⚠️ HIZ SINIRI AŞILDI: Çok fazla istek attınız."}), 429
 
@@ -134,11 +153,11 @@ def chat():
     pii_results = detect_pii(user_message)
     if pii_results:
         detected_entities = [res.entity_type for res in pii_results]
-        log_to_db(user_message, "Blocked by Presidio DLP", f"PII Leak Attempt: {', '.join(detected_entities)}")
+        log_to_db(user_message, "Blocked by Presidio DLP", f"PII Leak Attempt: {', '.join(detected_entities)}", client_ip, user_agent, endpoint)
         return jsonify({"reply": f"🛡️ DLP UYARISI: Mesajınızda hassas veri tespit edildi! Algılanan: {', '.join(detected_entities)}"}), 400
 
     if detect_prompt_injection(user_message):
-        log_to_db(user_message, "Blocked before reaching model", "Prompt Injection Attempt")
+        log_to_db(user_message, "Blocked before reaching model", "Prompt Injection Attempt", client_ip, user_agent, endpoint)
         return jsonify({"reply": "🛡️ GÜVENLİK UYARISI: Şüpheli talimat değiştirme girişimi tespit edildi ve engellendi."}), 400
 
     # RAG: ilgili dokuman parcalarini getir
@@ -146,7 +165,7 @@ def chat():
 
     if rag_context:
         if detect_prompt_injection(rag_context):
-            log_to_db(user_message, rag_context, "RAG Poisoning Attempt Detected")
+            log_to_db(user_message, rag_context, "RAG Poisoning Attempt Detected", client_ip, user_agent, endpoint)
             return jsonify({"reply": "🛡️ GÜVENLİK UYARISI: Bilgi tabanında şüpheli içerik tespit edildi."}), 400
         
         # RAG context icindeki PII varsa maskele
@@ -175,7 +194,7 @@ User question: {user_message}"""
         
         ai_pii_results = detect_pii(raw_ai_response)
         if ai_pii_results:
-            log_to_db(user_message, raw_ai_response, "AI Output PII Leak Prevented")
+            log_to_db(user_message, raw_ai_response, "AI Output PII Leak Prevented", client_ip, user_agent, endpoint)
             raw_ai_response = "🛡️ DLP Kalkanı: Yapay zekanın ürettiği yanıt hassas veri içerdiği için engellendi."
 
         system_prompt_fragments = [
@@ -186,7 +205,7 @@ User question: {user_message}"""
             "SUSPICIOUS REQUESTS"
         ]
         if any(fragment in raw_ai_response for fragment in system_prompt_fragments):
-            log_to_db(user_message, raw_ai_response, "System Prompt Leakage Attempt Blocked")
+            log_to_db(user_message, raw_ai_response, "System Prompt Leakage Attempt Blocked", client_ip, user_agent, endpoint)
             raw_ai_response = "🛡️ GÜVENLİK UYARISI: Bu bilgi paylaşılamaz."
 
         return jsonify({"reply": raw_ai_response})
@@ -194,6 +213,7 @@ User question: {user_message}"""
         return jsonify({"error": str(e)}), 500
 
 @app.route('/admin/dashboard', methods=['GET'])
+@require_auth
 def soc_dashboard():
     logs = []
     try:
@@ -260,6 +280,12 @@ def rag_load():
     
     if not os.path.exists(file_path):
         return jsonify({"error": f"Dosya bulunamadı: {file_path}"}), 404
+    
+    # Dosya boyutu sınırı — max 1MB (D: Denial of Service koruması)
+    MAX_FILE_SIZE = 1 * 1024 * 1024  # 1MB
+    file_size = os.path.getsize(file_path)
+    if file_size > MAX_FILE_SIZE:
+        return jsonify({"error": f"Dosya çok büyük. Max 1MB, gelen: {file_size // 1024}KB"}), 400
     
     chunks = load_text_document(file_path, doc_id)
     return jsonify({"success": True, "chunks_loaded": chunks, "doc_id": doc_id})
