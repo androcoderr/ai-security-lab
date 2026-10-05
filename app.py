@@ -367,4 +367,5 @@ def rag_load():
     return jsonify({"success": True, "chunks_loaded": chunks, "doc_id": doc_id})
 
 if __name__ == '__main__':
+    verify_model_hash()
     app.run(host='0.0.0.0', port=5000)
