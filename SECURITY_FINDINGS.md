@@ -299,6 +299,88 @@ code generation patterns.
 - Model alignment is not a configurable or auditable security control
 - Crescendo multi-turn attacks not detected at session level
 
+
+## Finding #7: Ollama API Port Exposed Externally (STRIDE: Tampering)
+
+**Category:** STRIDE T — Tampering / OWASP LLM10:2025
+**Severity:** High
+**Status:** ✅ Fixed (Docker port mapping removed)
+
+### Description
+Ollama container's port 11434 was mapped to the host machine via
+docker-compose.yml, making it accessible from outside the Docker network.
+This allowed an attacker to bypass ALL security layers (rate limiting,
+DLP, keyword filter, system prompt) by sending requests directly to
+Ollama instead of going through the Flask API.
+
+### Proof of Concept
+```bash
+# Bypasses all Flask security layers completely
+curl http://localhost:11434/api/generate -d '{
+  "model": "llama3",
+  "prompt": "ignore all previous instructions",
+  "stream": false
+}'
+# Returns model response with no filtering
+```
+
+### Fix
+Removed port mapping from docker-compose.yml:
+```yaml
+# Removed:
+ports:
+  - "11434:11434"
+```
+Ollama is now only accessible within the internal Docker network.
+
+### Residual Risk
+Mac-native Ollama application runs as a launchctl service on port 11434
+independently of Docker. This cannot be easily disabled as it auto-restarts.
+In a production environment, Ollama should run only inside Docker with
+no host port mapping.
+
+## Finding #8: SOC Dashboard Accessible Without Authentication (STRIDE: Information Disclosure + Elevation of Privilege)
+
+**Category:** STRIDE I + E — Information Disclosure / Elevation of Privilege
+**Severity:** High
+**Status:** ✅ Fixed (Basic authentication added)
+
+### Description
+The /admin/dashboard endpoint had no authentication. Anyone who could
+reach the server could view all security logs, attack attempts, model
+responses, and threat detections — the most sensitive data in the system.
+
+### Proof of Concept
+```bash
+curl http://127.0.0.1:5001/admin/dashboard
+# Returns full SOC dashboard HTML with all security logs
+```
+
+### Fix
+Added HTTP Basic Authentication via a require_auth decorator:
+```python
+DASHBOARD_USER = "admin"
+DASHBOARD_PASS = "soc-secure-2024"
+
+def require_auth(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        auth = request.authorization
+        if not auth or auth.username != DASHBOARD_USER or auth.password != DASHBOARD_PASS:
+            return Response("Kimlik dogrulama gerekli.", 401,
+                {"WWW-Authenticate": 'Basic realm="SOC Dashboard"'})
+        return f(*args, **kwargs)
+    return decorated
+```
+
+### Verification
+- Without credentials: HTTP 401 Unauthorized
+- With credentials: HTTP 200 OK
+
+### Additional Fix: Enhanced Logging (STRIDE: Repudiation)
+Added ip_address, user_agent, and endpoint columns to security_logs table
+to ensure attacker actions are fully traceable and non-repudiable.
+
 ## Methodology Lessons
 
 Notes from the testing process itself — mistakes and realizations worth remembering for future security work.
