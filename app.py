@@ -139,6 +139,47 @@ def detect_prompt_injection(text):
     text_lower = text.lower()
     return any(pattern in text_lower for pattern in suspicious_patterns)
 
+
+def check_anomaly(client_ip):
+    """Son 5 dakikadaki anomalileri kontrol et."""
+    try:
+        conn = psycopg2.connect(host=DB_HOST, user=DB_USER, password=DB_PASS, dbname=DB_NAME)
+        cur = conn.cursor()
+
+        # Son 5 dakikadaki toplam istek
+        cur.execute("""
+            SELECT COUNT(*) FROM security_logs
+            WHERE timestamp > NOW() - INTERVAL '5 minutes'
+        """)
+        total = cur.fetchone()[0]
+
+        # Son 5 dakikadaki injection girişimleri
+        cur.execute("""
+            SELECT COUNT(*) FROM security_logs
+            WHERE timestamp > NOW() - INTERVAL '5 minutes'
+            AND threat_type LIKE '%Injection%'
+        """)
+        injections = cur.fetchone()[0]
+
+        # Anomali kontrolleri
+        if total > 100:
+            cur.execute(
+                "INSERT INTO security_logs (user_prompt, ai_raw_response, threat_type, ip_address) VALUES (%s, %s, %s, %s)",
+                ("SYSTEM", f"Son 5 dakikada {total} istek", "ALERT: Yuksek istek sayisi", client_ip)
+            )
+
+        if total > 0 and injections / total > 0.1:
+            cur.execute(
+                "INSERT INTO security_logs (user_prompt, ai_raw_response, threat_type, ip_address) VALUES (%s, %s, %s, %s)",
+                ("SYSTEM", f"Injection orani: {injections}/{total}", "ALERT: Yuksek injection orani", client_ip)
+            )
+
+        conn.commit()
+        cur.close()
+        conn.close()
+    except Exception as e:
+        print(f"Anomaly check error: {e}")
+
 @app.route('/api/chat', methods=['POST'])
 def chat():
     # API key kontrolu
@@ -149,6 +190,7 @@ def chat():
     client_ip = request.remote_addr
     user_agent = request.headers.get('User-Agent', 'unknown')
     endpoint = request.path
+    check_anomaly(client_ip)
     if not check_rate_limit(client_ip):
         return jsonify({"reply": "⚠️ HIZ SINIRI AŞILDI: Çok fazla istek attınız."}), 429
 
