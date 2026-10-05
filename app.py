@@ -1,7 +1,7 @@
-RAG_API_KEY = "rag-secret-key-2024"
+RAG_API_KEY = os.environ.get("RAG_API_KEY", "")
 
-DASHBOARD_USER = "admin"
-DASHBOARD_PASS = "soc-secure-2024"
+DASHBOARD_USER = os.environ.get("DASHBOARD_USER", "admin")
+DASHBOARD_PASS = os.environ.get("DASHBOARD_PASS", "")
 
 def require_auth(f):
     @wraps(f)
@@ -48,7 +48,7 @@ analyzer = AnalyzerEngine()
 
 DB_HOST = os.environ.get("DB_HOST", "db") 
 DB_USER = os.environ.get("DB_USER", "postgres")
-DB_PASS = os.environ.get("DB_PASS", "mysecretpassword")
+DB_PASS = os.environ.get("DB_PASS", "")
 DB_NAME = os.environ.get("DB_NAME", "postgres")
 
 REDIS_HOST = os.environ.get("REDIS_HOST", "redis")

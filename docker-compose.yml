@@ -33,6 +33,8 @@ services:
 
   backend:
     build: .
+    env_file:
+      - .env
     container_name: hacker-lab-backend
     ports:
       - "5001:5000"
