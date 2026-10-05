@@ -15,6 +15,10 @@ RUN python -m spacy download en_core_web_lg
 
 COPY . .
 
+# Non-root kullanici olustur
+RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app
+USER appuser
+
 EXPOSE 5000
 
 CMD ["python", "app.py"]
