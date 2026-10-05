@@ -46,6 +46,33 @@ from presidio_analyzer import AnalyzerEngine
 
 app = Flask(__name__)
 
+EXPECTED_MODEL_HASH = "sha256-6a0746a1ec1aef3e7ec53868f220ff6e389f6f8ef87a01d77c96807de94ca2aa"
+
+def verify_model_hash():
+    """Llama3 model hash'ini dogrula."""
+    try:
+        import requests as req
+        response = req.post(
+            "http://ollama:11434/api/show",
+            json={"name": "llama3"}
+        )
+        model_info = response.json()
+        actual_hash = model_info.get("digest", "")
+        
+        if actual_hash != EXPECTED_MODEL_HASH:
+            print(f"KRITIK GUVENLIK UYARISI: Model hash uyusmazligi!")
+            print(f"Beklenen: {EXPECTED_MODEL_HASH}")
+            print(f"Bulunan:  {actual_hash}")
+            return False
+        
+        print(f"Model hash dogrulandi: {actual_hash[:20]}...")
+        return True
+    except Exception as e:
+        print(f"Model hash kontrolu basarisiz: {e}")
+        return False
+
+
+
 analyzer = AnalyzerEngine()
 
 DB_HOST = os.environ.get("DB_HOST", "db") 
