@@ -1,4 +1,5 @@
 RAG_API_KEY = os.environ.get("RAG_API_KEY", "")
+CHAT_API_KEY = os.environ.get("CHAT_API_KEY", "")
 
 DASHBOARD_USER = os.environ.get("DASHBOARD_USER", "admin")
 DASHBOARD_PASS = os.environ.get("DASHBOARD_PASS", "")
@@ -139,6 +140,11 @@ def detect_prompt_injection(text):
 
 @app.route('/api/chat', methods=['POST'])
 def chat():
+    # API key kontrolu
+    chat_key = request.headers.get('X-Chat-API-Key', '')
+    if CHAT_API_KEY and chat_key != CHAT_API_KEY:
+        return jsonify({"error": "Unauthorized"}), 401
+
     client_ip = request.remote_addr
     user_agent = request.headers.get('User-Agent', 'unknown')
     endpoint = request.path
