@@ -1,0 +1,224 @@
+time="2026-10-05T15:33:18+03:00" level=warning msg="/Users/aysenurula/hacker-lab/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+ Image hacker-lab-backend Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 518B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 511B done
+#2 DONE 0.0s
+
+#3 [auth] library/python:pull token for registry-1.docker.io
+#3 DONE 0.0s
+
+#4 [internal] load metadata for docker.io/library/python:3.10-slim
+#4 DONE 1.2s
+
+#5 [internal] load .dockerignore
+#5 transferring context: 105B done
+#5 DONE 0.0s
+
+#6 [1/8] FROM docker.io/library/python:3.10-slim@sha256:c1aaf3d03e14944a039a1647e0b3f6f34c6bee517bac6ff380215ee099c4e808
+#6 resolve docker.io/library/python:3.10-slim@sha256:c1aaf3d03e14944a039a1647e0b3f6f34c6bee517bac6ff380215ee099c4e808 done
+#6 DONE 0.0s
+
+#7 [internal] load build context
+#7 transferring context: 1.16kB done
+#7 DONE 0.0s
+
+#8 [3/8] RUN apt-get update && apt-get install -y     build-essential     && rm -rf /var/lib/apt/lists/*
+#8 CACHED
+
+#9 [2/8] WORKDIR /app
+#9 CACHED
+
+#10 [4/8] COPY requirements.txt .
+#10 CACHED
+
+#11 [5/8] RUN pip install --no-cache-dir -r requirements.txt
+#11 0.888 Collecting flask==3.1.3
+#11 1.018   Downloading flask-3.1.3-py3-none-any.whl (103 kB)
+#11 1.070      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 103.4/103.4 kB 2.3 MB/s eta 0:00:00
+#11 1.178 Collecting requests==2.33.0
+#11 1.205   Downloading requests-2.33.0-py3-none-any.whl (65 kB)
+#11 1.225      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 65.0/65.0 kB 3.9 MB/s eta 0:00:00
+#11 1.413 Collecting psycopg2-binary==2.9.12
+#11 1.438   Downloading psycopg2_binary-2.9.12-cp310-cp310-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl (5.9 MB)
+#11 7.331      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5.9/5.9 MB 999.9 kB/s eta 0:00:00
+#11 7.450 Collecting redis==7.0.1
+#11 7.474   Downloading redis-7.0.1-py3-none-any.whl (339 kB)
+#11 7.800      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 339.9/339.9 kB 1.5 MB/s eta 0:00:00
+#11 7.881 Collecting pyjwt==2.15.0
+#11 7.906   Downloading pyjwt-2.15.0-py3-none-any.whl (33 kB)
+#11 7.983 Collecting markdown==3.9
+#11 8.009   Downloading markdown-3.9-py3-none-any.whl (107 kB)
+#11 8.055      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 107.4/107.4 kB 2.3 MB/s eta 0:00:00
+#11 8.120 Collecting bleach==6.4.0
+#11 8.146   Downloading bleach-6.4.0-py3-none-any.whl (165 kB)
+#11 8.210      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 165.1/165.1 kB 2.6 MB/s eta 0:00:00
+#11 8.290 Collecting presidio-analyzer==2.2.360
+#11 8.315   Downloading presidio_analyzer-2.2.360-py3-none-any.whl (128 kB)
+#11 8.363      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 128.7/128.7 kB 2.8 MB/s eta 0:00:00
+#11 8.887 Collecting spacy==3.8.16
+#11 8.914   Downloading spacy-3.8.16-cp310-cp310-manylinux_2_24_aarch64.manylinux_2_28_aarch64.whl (32.9 MB)
+#11 43.05      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 32.9/32.9 MB 958.5 kB/s eta 0:00:00
+#11 43.22 Collecting chromadb==0.6.0
+#11 43.24   Downloading chromadb-0.6.0-py3-none-any.whl (602 kB)
+#11 43.74      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 602.1/602.1 kB 1.2 MB/s eta 0:00:00
+#11 43.82 Collecting sentence-transformers==2.7.0
+#11 43.85   Downloading sentence_transformers-2.7.0-py3-none-any.whl (171 kB)
+#11 43.98      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 171.5/171.5 kB 1.4 MB/s eta 0:00:00
+#11 44.08 Collecting pypdf==4.2.0
+#11 44.10   Downloading pypdf-4.2.0-py3-none-any.whl (290 kB)
+#11 44.28      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 290.4/290.4 kB 1.7 MB/s eta 0:00:00
+#11 44.36 Collecting jinja2>=3.1.2
+#11 44.39   Downloading jinja2-3.1.6-py3-none-any.whl (134 kB)
+#11 44.51      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 134.9/134.9 kB 1.2 MB/s eta 0:00:00
+#11 44.60 Collecting itsdangerous>=2.2.0
+#11 44.63   Downloading itsdangerous-2.2.0-py3-none-any.whl (16 kB)
+#11 44.80 Collecting markupsafe>=2.1.1
+#11 44.83   Downloading markupsafe-3.0.4-cp310-cp310-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (22 kB)
+#11 44.91 Collecting werkzeug>=3.1.0
+#11 44.93   Downloading werkzeug-3.1.9-py3-none-any.whl (228 kB)
+#11 45.07      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 228.7/228.7 kB 1.9 MB/s eta 0:00:00
+#11 45.15 Collecting click>=8.1.3
+#11 45.18   Downloading click-8.5.0-py3-none-any.whl (125 kB)
+#11 45.24      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 125.3/125.3 kB 2.0 MB/s eta 0:00:00
+#11 45.31 Collecting blinker>=1.9.0
+#11 45.33   Downloading blinker-1.9.0-py3-none-any.whl (8.5 kB)
+#11 45.63 Collecting charset_normalizer<4,>=2
+#11 45.65   Downloading charset_normalizer-3.5.2-cp310-cp310-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (260 kB)
+#11 45.76      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 260.9/260.9 kB 2.3 MB/s eta 0:00:00
+#11 45.84 Collecting certifi>=2023.5.7
+#11 45.86   Downloading certifi-2026.7.22-py3-none-any.whl (136 kB)
+#11 45.92      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 137.0/137.0 kB 2.7 MB/s eta 0:00:00
+#11 45.98 Collecting idna<4,>=2.5
+#11 46.01   Downloading idna-3.20-py3-none-any.whl (69 kB)
+#11 46.04      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 69.6/69.6 kB 2.5 MB/s eta 0:00:00
+#11 46.12 Collecting urllib3<3,>=1.26
+#11 46.14   Downloading urllib3-2.8.0-py3-none-any.whl (135 kB)
+#11 46.19      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 135.7/135.7 kB 3.1 MB/s eta 0:00:00
+#11 46.26 Collecting async-timeout>=4.0.3
+#11 46.28   Downloading async_timeout-5.0.1-py3-none-any.whl (6.2 kB)
+#11 46.37 Collecting typing_extensions>=4.0
+#11 46.40   Downloading typing_extensions-4.16.0-py3-none-any.whl (45 kB)
+#11 46.42      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 45.6/45.6 kB 2.4 MB/s eta 0:00:00
+#11 46.48 Collecting webencodings
+#11 46.50   Downloading webencodings-0.6.1-py3-none-any.whl (8.7 kB)
+#11 47.73 Collecting regex
+#11 47.76   Downloading regex-2026.9.29-cp310-cp310-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (793 kB)
+#11 48.31      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 793.1/793.1 kB 1.4 MB/s eta 0:00:00
+#11 48.39 Collecting tldextract
+#11 48.43   Downloading tldextract-5.4.0-py3-none-any.whl (107 kB)
+#11 48.54      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 107.5/107.5 kB 1.0 MB/s eta 0:00:00
+#11 48.69 Collecting phonenumbers<10.0.0,>=8.12
+#11 48.71   Downloading phonenumbers-9.0.40-py2.py3-none-any.whl (2.6 MB)
+#11 51.24      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.6/2.6 MB 1.0 MB/s eta 0:00:00
+#11 51.38 Collecting pyyaml
+#11 51.40   Downloading pyyaml-6.0.3-cp310-cp310-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (740 kB)
+#11 52.09      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 740.6/740.6 kB 1.1 MB/s eta 0:00:00
+#11 52.78 Collecting numpy>=1.19.0
+#11 52.81   Downloading numpy-2.2.6-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (14.3 MB)
+#11 67.51      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 14.3/14.3 MB 956.8 kB/s eta 0:00:00
+#11 67.60 Collecting spacy-loggers<2.0.0,>=1.0.0
+#11 67.62   Downloading spacy_loggers-1.0.5-py3-none-any.whl (22 kB)
+#11 67.79 Collecting preshed<3.1.0,>=3.0.2
+#11 67.81   Downloading preshed-3.0.13-cp310-cp310-manylinux2014_aarch64.manylinux_2_17_aarch64.whl (780 kB)
+#11 68.43      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 780.3/780.3 kB 1.3 MB/s eta 0:00:00
+#11 69.08 Collecting thinc<8.4.0,>=8.3.12
+#11 69.10   Downloading thinc-8.3.13-cp310-cp310-manylinux2014_aarch64.manylinux_2_17_aarch64.whl (3.9 MB)
+#11 72.97      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.9/3.9 MB 1.0 MB/s eta 0:00:00
+#11 73.17 Collecting murmurhash<1.1.0,>=0.28.0
+#11 73.19   Downloading murmurhash-1.0.15-cp310-cp310-manylinux2014_aarch64.manylinux_2_17_aarch64.whl (123 kB)
+#11 73.36      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 123.2/123.2 kB 734.4 kB/s eta 0:00:00
+#11 73.44 Collecting wasabi<1.2.0,>=0.9.1
+#11 73.48   Downloading wasabi-1.1.3-py3-none-any.whl (27 kB)
+#11 73.51 Requirement already satisfied: packaging>=20.0 in /usr/local/lib/python3.10/site-packages (from spacy==3.8.16->-r requirements.txt (line 9)) (26.3)
+#11 73.66 Collecting cymem<2.1.0,>=2.0.2
+#11 73.68   Downloading cymem-2.0.13-cp310-cp310-manylinux2014_aarch64.manylinux_2_17_aarch64.whl (231 kB)
+#11 73.81      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 231.5/231.5 kB 1.9 MB/s eta 0:00:00
+#11 73.89 Collecting confection<2.0.0,>=1.3.2
+#11 73.91   Downloading confection-1.3.3-py3-none-any.whl (35 kB)
+#11 74.25 Collecting pydantic<3.0.0,>=2.0.0
+#11 74.28   Downloading pydantic-2.13.5-py3-none-any.whl (472 kB)
+#11 74.82      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 472.6/472.6 kB 875.2 kB/s eta 0:00:00
+#11 74.94 Collecting tqdm<5.0.0,>=4.38.0
+#11 74.96   Downloading tqdm-4.70.1-py3-none-any.whl (80 kB)
+#11 75.00      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 80.2/80.2 kB 2.3 MB/s eta 0:00:00
+#11 75.00 Requirement already satisfied: setuptools in /usr/local/lib/python3.10/site-packages (from spacy==3.8.16->-r requirements.txt (line 9)) (79.0.1)
+#11 75.06 Collecting weasel<2.0.0,>=1.0.0
+#11 75.08   Downloading weasel-1.0.0-py3-none-any.whl (50 kB)
+#11 75.11      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 50.7/50.7 kB 3.0 MB/s eta 0:00:00
+#11 75.17 Collecting spacy-legacy<3.1.0,>=3.0.11
+#11 75.19   Downloading spacy_legacy-3.0.12-py2.py3-none-any.whl (29 kB)
+#11 75.30 Collecting typer<1.0.0,>=0.3.0
+#11 75.32   Downloading typer-0.27.2-py3-none-any.whl (123 kB)
+#11 75.37      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 123.1/123.1 kB 2.8 MB/s eta 0:00:00
+#11 75.51 Collecting srsly<3.0.0,>=2.5.3
+#11 75.54   Downloading srsly-2.5.4-cp310-cp310-manylinux2014_aarch64.manylinux_2_17_aarch64.whl (1.2 MB)
+#11 76.51      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.2/1.2 MB 1.2 MB/s eta 0:00:00
+#11 76.59 Collecting catalogue<2.1.0,>=2.0.6
+#11 76.61   Downloading catalogue-2.0.10-py3-none-any.whl (17 kB)
+#11 76.73 Collecting opentelemetry-sdk>=1.2.0
+#11 76.75   Downloading opentelemetry_sdk-1.45.0-py3-none-any.whl (140 kB)
+#11 76.88      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 140.1/140.1 kB 1.2 MB/s eta 0:00:00
+#11 77.00 Collecting rich>=10.11.0
+#11 77.02   Downloading rich-15.0.0-py3-none-any.whl (310 kB)
+#11 77.20      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 310.7/310.7 kB 1.8 MB/s eta 0:00:00
+#11 77.28 Collecting overrides>=7.3.1
+#11 77.31   Downloading overrides-7.7.0-py3-none-any.whl (17 kB)
+#11 77.41 Collecting kubernetes>=28.1.0
+#11 77.44   Downloading kubernetes-36.0.3-py2.py3-none-any.whl (4.6 MB)
+#11 82.52      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.6/4.6 MB 907.7 kB/s eta 0:00:00
+#11 82.62 Collecting opentelemetry-exporter-otlp-proto-grpc>=1.2.0
+#11 82.64   Downloading opentelemetry_exporter_otlp_proto_grpc-1.45.0-py3-none-any.whl (19 kB)
+#11 83.47 Collecting orjson>=3.9.12
+#11 83.50   Downloading orjson-3.12.0-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (131 kB)
+#11 83.60      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 131.1/131.1 kB 1.4 MB/s eta 0:00:00
+#11 83.74 Collecting fastapi>=0.95.2
+#11 83.76   Downloading fastapi-0.142.2-py3-none-any.whl (144 kB)
+#11 83.91      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 144.4/144.4 kB 1.0 MB/s eta 0:00:00
+#11 84.00 Collecting importlib-resources
+#11 84.04   Downloading importlib_resources-7.1.0-py3-none-any.whl (37 kB)
+#11 85.54 Collecting grpcio>=1.58.0
+#11 85.57   Downloading grpcio-1.84.0-cp310-cp310-manylinux2014_aarch64.manylinux_2_17_aarch64.whl (7.0 MB)
+#11 92.86      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 7.0/7.0 MB 964.7 kB/s eta 0:00:00
+#11 93.02 Collecting bcrypt>=4.0.1
+#11 93.05   Downloading bcrypt-5.0.0-cp39-abi3-manylinux_2_34_aarch64.whl (275 kB)
+#11 93.24      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 275.7/275.7 kB 1.6 MB/s eta 0:00:00
+#11 93.32 Collecting tenacity>=8.2.3
+#11 93.34   Downloading tenacity-9.1.4-py3-none-any.whl (28 kB)
+#11 93.44 Collecting opentelemetry-api>=1.2.0
+#11 93.47   Downloading opentelemetry_api-1.45.0-py3-none-any.whl (60 kB)
+#11 93.49      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 60.0/60.0 kB 3.1 MB/s eta 0:00:00
+#11 93.70 Collecting mmh3>=4.0.1
+#11 93.73   Downloading mmh3-5.3.1-cp310-cp310-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (103 kB)
+#11 93.78      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 103.8/103.8 kB 2.8 MB/s eta 0:00:00
+#11 93.85 Collecting opentelemetry-instrumentation-fastapi>=0.41b0
+#11 93.88   Downloading opentelemetry_instrumentation_fastapi-0.66b0-py3-none-any.whl (14 kB)
+#11 93.94 Collecting build>=1.0.3
+#11 93.98   Downloading build-1.6.1-py3-none-any.whl (31 kB)
+#11 94.16 Collecting posthog>=2.4.0
+#11 94.18   Downloading posthog-7.63.0-py3-none-any.whl (824 kB)
+#11 94.96      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 824.0/824.0 kB 1.1 MB/s eta 0:00:00
+#11 95.09 Collecting pypika>=0.48.9
+#11 95.13   Downloading pypika-0.51.1-py2.py3-none-any.whl (60 kB)
+#11 95.16      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 60.6/60.6 kB 3.3 MB/s eta 0:00:00
+#11 95.58 Collecting tokenizers>=0.13.2
+#11 95.61   Downloading tokenizers-0.23.2-cp310-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (3.5 MB)
+#11 99.00      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.5/3.5 MB 1.0 MB/s eta 0:00:00
+#11 99.11 Collecting uvicorn[standard]>=0.18.3
+#11 99.14   Downloading uvicorn-0.54.0-py3-none-any.whl (87 kB)
+#11 99.21      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 87.4/87.4 kB 1.3 MB/s eta 0:00:00
+#11 99.29 Collecting httpx>=0.27.0
+#11 99.31   Downloading httpx-0.28.1-py3-none-any.whl (73 kB)
+#11 99.35      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 73.5/73.5 kB 1.9 MB/s eta 0:00:00
+#11 99.45 Collecting chroma-hnswlib==0.7.6
+#11 99.48   Downloading chroma_hnswlib-0.7.6-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (2.4 MB)
+#11 101.8      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.4/2.4 MB 1.0 MB/s eta 0:00:00
+#11 102.0 Collecting onnxruntime>=1.14.1
+#11 102.1   Downloading onnxruntime-1.23.2-cp310-cp310-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl (15.2 MB)
+#11 118.1      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 15.2/15.2 MB 931.4 kB/s eta 0:00:00
+#11 118.3 Collecting torch>=1.11.0
+#11 118.4   Downloading torch-2.14.1-cp310-cp310-manylinux_2_28_aarch64.whl (454.0 MB)
+
