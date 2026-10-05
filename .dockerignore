@@ -1,0 +1,7 @@
+pyrit-env/
+hacker_chat/
+__pycache__/
+*.pyc
+.env
+.git/
+chroma_db/
