@@ -8,7 +8,7 @@ RUN apt-get update && apt-get install -y \
 
 COPY requirements.txt .
 
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --timeout 120 --retries 5 -r requirements.txt
 
 # Presidio için gerekli spaCy dil modelini yüklüyoruz
 RUN python -m spacy download en_core_web_lg
