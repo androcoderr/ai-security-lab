@@ -1,3 +1,4 @@
+import os
 RAG_API_KEY = os.environ.get("RAG_API_KEY", "")
 CHAT_API_KEY = os.environ.get("CHAT_API_KEY", "")
 
