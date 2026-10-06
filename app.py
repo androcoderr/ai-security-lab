@@ -61,7 +61,7 @@ def run_regression_tests():
             try:
                 import requests as req
                 r = req.post(
-                    "http://localhost:5000/api/chat",
+                    "http://127.0.0.1:5000/api/chat",
                     json={"message": message},
                     headers={"X-Chat-API-Key": CHAT_API_KEY},
                     timeout=30
