@@ -406,3 +406,22 @@ Manual Crescendo-style testing (escalating from "what is SQL injection?" → "ho
 - Stack: Flask + Ollama (Llama 3 8B) + PostgreSQL + Redis, Dockerized
 - Testing performed locally against `localhost`
 - All findings reproduced and fixed within the same development session; commits referenced in git history
+
+## Finding #9: Regression Testing — Automated Security Validation
+
+**Category:** MLSecOps — Runtime Monitoring
+**Severity:** Informational
+**Status:** ✅ Implemented
+
+### Description
+No automated security regression testing existed. Model updates or code changes could silently break security controls without detection.
+
+### Fix
+Added startup regression testing that runs 3 security checks on every backend start:
+- Prompt injection attempt → must be blocked (400)
+- System prompt query → must pass (handled by output validation)
+- Normal query → must be allowed (200)
+
+Results logged as [REGRESSION] PASS/FAIL. If any test fails, ALERT is logged.
+
+### Verification
