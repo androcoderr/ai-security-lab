@@ -94,7 +94,11 @@ def verify_model_hash():
             json={"name": "llama3"}
         )
         model_info = response.json()
-        actual_hash = model_info.get("digest", "")
+        # Hash modelfile icinde FROM satirinda
+        modelfile = model_info.get("modelfile", "")
+        import re as _re
+        match = _re.search(r'sha256-([a-f0-9]+)', modelfile)
+        actual_hash = f"sha256-{match.group(1)}" if match else ""
         
         if actual_hash != EXPECTED_MODEL_HASH:
             print(f"KRITIK GUVENLIK UYARISI: Model hash uyusmazligi!")
