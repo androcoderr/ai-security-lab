@@ -368,6 +368,9 @@ def chat():
 
     user_message = request.json.get("message", "")
 
+    if check_crescendo(client_ip, user_message):
+        return jsonify({"reply": "🛡️ GÜVENLİK UYARISI: Şüpheli aktivite örüntüsü tespit edildi."}), 400
+
     if len(user_message) > 2000:
         return jsonify({"reply": "⚠️ Mesaj çok uzun. Lütfen 2000 karakterin altında bir mesaj gönderin."}), 400
 
