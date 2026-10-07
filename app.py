@@ -517,7 +517,9 @@ def rag_load():
 if __name__ == '__main__':
     verify_model_hash()
     run_regression_tests()
-    get_semantic_model()  # Semantic modeli onceden yukle
+    print("[STARTUP] Semantic model yukleniyor...")
+    get_semantic_model()
+    print("[STARTUP] Semantic model yuklendi.")
     import os
     ssl_context = ('cert.pem', 'key.pem') if os.path.exists('cert.pem') else None
     app.run(host='0.0.0.0', port=5000, ssl_context=ssl_context)
