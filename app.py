@@ -192,7 +192,7 @@ def get_semantic_model():
     if _semantic_model is None:
         from sentence_transformers import SentenceTransformer
         import numpy as np
-        _semantic_model = SentenceTransformer('all-MiniLM-L6-v2')
+        _semantic_model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
         _attack_embeddings = _semantic_model.encode(KNOWN_ATTACKS)
     return _semantic_model, _attack_embeddings
 
