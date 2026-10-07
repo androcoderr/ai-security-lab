@@ -361,8 +361,6 @@ def chat():
     user_agent = request.headers.get('User-Agent', 'unknown')
     endpoint = request.path
     check_anomaly(client_ip)
-    if check_crescendo(client_ip, user_message):
-        return jsonify({"reply": "🛡️ GÜVENLİK UYARISI: Şüpheli aktivite örüntüsü tespit edildi."}), 400
     if not check_rate_limit(client_ip):
         return jsonify({"reply": "⚠️ HIZ SINIRI AŞILDI: Çok fazla istek attınız."}), 429
 
