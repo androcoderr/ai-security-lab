@@ -248,6 +248,68 @@ def detect_prompt_injection(text):
     return any(pattern in text_lower for pattern in suspicious_patterns)
 
 
+
+def calculate_risk_score(message):
+    """Mesajın risk skorunu hesapla (0.0 - 1.0)"""
+    message_lower = message.lower()
+    
+    high_risk = [
+        "exploit", "hack", "inject", "bypass", "shell",
+        "payload", "malware", "vulnerability", "attack",
+        "saldır", "hack", "açık", "güvenlik açığı"
+    ]
+    medium_risk = [
+        "sql", "injection", "script", "code", "execute",
+        "system", "admin", "password", "şifre", "veritabanı"
+    ]
+    low_risk = [
+        "security", "güvenlik", "test", "example", "örnek",
+        "nasıl", "nedir", "what is", "how to"
+    ]
+    
+    score = 0.0
+    for word in high_risk:
+        if word in message_lower:
+            score += 0.4
+    for word in medium_risk:
+        if word in message_lower:
+            score += 0.2
+    for word in low_risk:
+        if word in message_lower:
+            score += 0.1
+    
+    return min(score, 1.0)
+
+def check_crescendo(client_ip, message):
+    """Konusma gecmisine gore crescendo saldirisi tespit et."""
+    try:
+        key = f"crescendo:{client_ip}"
+        
+        # Mevcut skoru al
+        scores = r.lrange(key, 0, -1)
+        scores = [float(s) for s in scores]
+        
+        # Yeni mesajın risk skorunu hesapla
+        new_score = calculate_risk_score(message)
+        
+        # Skoru kaydet (son 10 mesaj)
+        r.lpush(key, new_score)
+        r.ltrim(key, 0, 9)
+        r.expire(key, 300)  # 5 dakika sonra sil
+        
+        # Kumulatif skor
+        scores.append(new_score)
+        cumulative = sum(scores)
+        
+        if cumulative >= 2.0:
+            print(f"[CRESCENDO] ALERT: {client_ip} kumulatif skor: {cumulative:.2f}")
+            return True
+        
+        return False
+    except Exception as e:
+        print(f"[CRESCENDO] Hata: {e}")
+        return False
+
 def check_anomaly(client_ip):
     """Son 5 dakikadaki anomalileri kontrol et."""
     try:
@@ -299,6 +361,8 @@ def chat():
     user_agent = request.headers.get('User-Agent', 'unknown')
     endpoint = request.path
     check_anomaly(client_ip)
+    if check_crescendo(client_ip, user_message):
+        return jsonify({"reply": "🛡️ GÜVENLİK UYARISI: Şüpheli aktivite örüntüsü tespit edildi."}), 400
     if not check_rate_limit(client_ip):
         return jsonify({"reply": "⚠️ HIZ SINIRI AŞILDI: Çok fazla istek attınız."}), 429
 
