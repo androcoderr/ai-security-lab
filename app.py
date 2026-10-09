@@ -213,6 +213,47 @@ def detect_semantic_injection(text, threshold=0.50):
         print(f"[SEMANTIC] Hata: {e}")
         return False
 
+
+FICTIONAL_FRAMES = [
+    "roman yazıyorum", "roman yaziyorum",
+    "senaryo için", "senaryo icin",
+    "akademik çalışma", "akademik calisma",
+    "varsayımsal olarak", "varsayimsal olarak",
+    "eğitim amaçlı", "egitim amacli",
+    "örnek olarak", "ornek olarak",
+    "teorik olarak",
+    "karakter olarak",
+    "hikaye için", "hikaye icin",
+    "araştırma amaçlı", "arastirma amacli",
+    "i'm writing a novel", "for my research",
+    "hypothetically", "for educational purposes",
+    "as a character", "in this story",
+    "fictional scenario", "for a movie script"
+]
+
+HARMFUL_COMBINED = [
+    "bomba", "patlayıcı", "patlayici", "silah",
+    "exploit", "hack", "saldırı", "saldiri",
+    "zararlı kod", "zararli kod", "malware",
+    "şifre kır", "sifre kir", "bypass",
+    "öldür", "oldur", "zarar ver",
+    "weapon", "bomb", "explosive", "poison",
+    "kill", "attack", "malicious code"
+]
+
+def detect_fictional_framing(text):
+    """Fictional framing + zararlı içerik kombinasyonunu tespit et."""
+    text_lower = text.lower()
+    
+    has_frame = any(f in text_lower for f in FICTIONAL_FRAMES)
+    has_harmful = any(h in text_lower for h in HARMFUL_COMBINED)
+    
+    if has_frame and has_harmful:
+        print(f"[FICTIONAL] Frame + zararlı içerik tespit edildi.")
+        return True
+    
+    return False
+
 def detect_prompt_injection(text):
     """Basit anahtar kelime bazli prompt injection tespiti (ilk savunma katmani)"""
     suspicious_patterns = [
@@ -378,7 +419,7 @@ def chat():
         log_to_db(user_message, "Blocked by Presidio DLP", f"PII Leak Attempt: {', '.join(detected_entities)}", client_ip, user_agent, endpoint)
         return jsonify({"reply": f"🛡️ DLP UYARISI: Mesajınızda hassas veri tespit edildi! Algılanan: {', '.join(detected_entities)}"}), 400
 
-    if detect_prompt_injection(user_message) or detect_semantic_injection(user_message):
+    if detect_prompt_injection(user_message) or detect_semantic_injection(user_message) or detect_fictional_framing(user_message):
         log_to_db(user_message, "Blocked before reaching model", "Prompt Injection Attempt", client_ip, user_agent, endpoint)
         return jsonify({"reply": "🛡️ GÜVENLİK UYARISI: Şüpheli talimat değiştirme girişimi tespit edildi ve engellendi."}), 400
 
