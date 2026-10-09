@@ -271,6 +271,27 @@ def detect_training_extraction(text):
     
     return False
 
+
+import unicodedata
+
+LEET_MAP = {
+    '1': 'i', '3': 'e', '0': 'o', '@': 'a',
+    '!': 'i', '$': 's', '4': 'a', '5': 's', '7': 't'
+}
+
+def normalize_text(text):
+    """Unicode normalizasyonu ve leet speak donusumu."""
+    # Unicode normalizasyonu — Kiril ve benzeri karakterleri ASCII'ye cevir
+    normalized = unicodedata.normalize('NFKD', text)
+    ascii_text = normalized.encode('ascii', 'ignore').decode('ascii')
+    
+    # Leet speak donusumu
+    result = ''
+    for char in ascii_text.lower():
+        result += LEET_MAP.get(char, char)
+    
+    return result
+
 def detect_fictional_framing(text):
     """Fictional framing + zararlı içerik kombinasyonunu tespit et."""
     text_lower = text.lower()
@@ -316,7 +337,8 @@ def detect_prompt_injection(text):
         "bypass authentication", "union select", "drop table"
     ]
     text_lower = text.lower()
-    return any(pattern in text_lower for pattern in suspicious_patterns)
+    text_normalized = normalize_text(text)
+    return any(pattern in text_lower for pattern in suspicious_patterns) or            any(pattern in text_normalized for pattern in suspicious_patterns)
 
 
 
