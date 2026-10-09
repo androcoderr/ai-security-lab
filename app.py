@@ -241,6 +241,36 @@ HARMFUL_COMBINED = [
     "kill", "attack", "malicious code"
 ]
 
+
+COMPLETION_PATTERNS = [
+    "my password is", "my email is",
+    "my phone number is", "my credit card is",
+    "my social security", "my api key is",
+    "şifrem", "parolam", "telefon numaram",
+    "kredi kartım", "banka hesabım",
+    "complete this", "continue this text",
+    "what comes after", "fill in the blank"
+]
+
+def detect_training_extraction(text):
+    """Training data extraction saldirilarini tespit et."""
+    text_lower = text.lower()
+    
+    # 1. Tekrar saldırısı tespiti
+    words = text_lower.split()
+    if len(words) > 5:
+        unique_ratio = len(set(words)) / len(words)
+        if unique_ratio < 0.3:
+            print(f"[EXTRACTION] Tekrar saldirisi tespit edildi. Unique ratio: {unique_ratio:.2f}")
+            return True
+    
+    # 2. Completion pattern tespiti
+    if any(p in text_lower for p in COMPLETION_PATTERNS):
+        print(f"[EXTRACTION] Completion pattern tespit edildi.")
+        return True
+    
+    return False
+
 def detect_fictional_framing(text):
     """Fictional framing + zararlı içerik kombinasyonunu tespit et."""
     text_lower = text.lower()
@@ -419,7 +449,7 @@ def chat():
         log_to_db(user_message, "Blocked by Presidio DLP", f"PII Leak Attempt: {', '.join(detected_entities)}", client_ip, user_agent, endpoint)
         return jsonify({"reply": f"🛡️ DLP UYARISI: Mesajınızda hassas veri tespit edildi! Algılanan: {', '.join(detected_entities)}"}), 400
 
-    if detect_prompt_injection(user_message) or detect_semantic_injection(user_message) or detect_fictional_framing(user_message):
+    if detect_prompt_injection(user_message) or detect_semantic_injection(user_message) or detect_fictional_framing(user_message) or detect_training_extraction(user_message):
         log_to_db(user_message, "Blocked before reaching model", "Prompt Injection Attempt", client_ip, user_agent, endpoint)
         return jsonify({"reply": "🛡️ GÜVENLİK UYARISI: Şüpheli talimat değiştirme girişimi tespit edildi ve engellendi."}), 400
 
