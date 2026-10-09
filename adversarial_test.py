@@ -1,5 +1,7 @@
 import requests
 import urllib3
+import time
+import time
 urllib3.disable_warnings()
 
 API_URL = "https://127.0.0.1:5001/api/chat"
@@ -53,12 +55,17 @@ for name, variant in VARIANTS.items():
     try:
         r = requests.post(
             API_URL,
-            json={"message": variant},
+            data=__import__("json").dumps({"message": variant}, ensure_ascii=False).encode("utf-8"),
             headers=HEADERS,
             verify=False,
-            timeout=15
+            timeout=60
         )
-        status = "BLOCKED" if r.status_code == 400 else "PASSED"
+        if r.status_code == 400:
+            status = "BLOCKED"
+        elif r.status_code == 429:
+            status = "RATE_LIMIT"
+        else:
+            status = "PASSED"
         if status == "BLOCKED":
             blocked += 1
         else:
@@ -66,6 +73,8 @@ for name, variant in VARIANTS.items():
         print(f"[{status}] {name}: {variant[:50]}")
     except Exception as e:
         print(f"[ERROR] {name}: {e}")
+    time.sleep(5)
+    time.sleep(5)
 
 print("=" * 60)
 print(f"SONUÇ: {blocked} engellendi, {passed} geçti")
