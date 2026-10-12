@@ -298,15 +298,18 @@ def scan_tool_description(tool):
     description = tool.get("description", "")
     name = tool.get("name", "")
     
-    # Keyword injection kontrolü
+    # Tüm description
     if detect_prompt_injection(description):
-        print(f"[TOOL SCAN] Zararlı tool description tespit edildi: {name}")
+        print(f"[TOOL SCAN] Keyword injection: {name}")
         return False, "Keyword injection tespit edildi"
     
-    # Semantic injection kontrolü
-    if detect_semantic_injection(description):
-        print(f"[TOOL SCAN] Semantic injection tespit edildi: {name}")
-        return False, "Semantic injection tespit edildi"
+    # Cümlelere bölerek semantic tara
+    sentences = [s.strip() for s in description.replace("!", ".").split(".") if s.strip()]
+    for sentence in sentences:
+        if len(sentence) > 10:
+            if detect_semantic_injection(sentence):
+                print(f"[TOOL SCAN] Semantic injection: {name} — {sentence[:50]}")
+                return False, "Semantic injection tespit edildi"
     
     return True, "Temiz"
 
