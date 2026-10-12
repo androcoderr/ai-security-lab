@@ -292,6 +292,24 @@ def normalize_text(text):
     
     return result
 
+
+def scan_tool_description(tool):
+    """Tool açıklamasını injection için tara."""
+    description = tool.get("description", "")
+    name = tool.get("name", "")
+    
+    # Keyword injection kontrolü
+    if detect_prompt_injection(description):
+        print(f"[TOOL SCAN] Zararlı tool description tespit edildi: {name}")
+        return False, "Keyword injection tespit edildi"
+    
+    # Semantic injection kontrolü
+    if detect_semantic_injection(description):
+        print(f"[TOOL SCAN] Semantic injection tespit edildi: {name}")
+        return False, "Semantic injection tespit edildi"
+    
+    return True, "Temiz"
+
 def detect_fictional_framing(text):
     """Fictional framing + zararlı içerik kombinasyonunu tespit et."""
     text_lower = text.lower()
@@ -644,9 +662,20 @@ def mcp_test():
     
     # Hangi tool listesi kullanılacak
     tools = POISONED_TOOLS if use_poisoned else TOOLS
+    
+    # Tool description tarama
+    safe_tools = []
+    blocked_tools = []
+    for tool in tools:
+        is_safe, reason = scan_tool_description(tool)
+        if is_safe:
+            safe_tools.append(tool)
+        else:
+            blocked_tools.append({"name": tool["name"], "reason": reason})
+    
     tool_context = "\n".join([
         f"Tool: {t['name']}\nDescription: {t['description']}"
-        for t in tools
+        for t in safe_tools
     ])
     
     # Tool açıklamalarını modele context olarak ver
@@ -667,7 +696,8 @@ Respond to the user message."""
         return jsonify({
             "reply": raw_response,
             "poisoned": use_poisoned,
-            "tool_context": tool_context
+            "tool_context": tool_context,
+            "blocked_tools": blocked_tools
         })
     except Exception as e:
         return jsonify({"error": str(e)}), 500
