@@ -605,6 +605,26 @@ def rag_load():
     chunks = load_text_document(file_path, doc_id)
     return jsonify({"success": True, "chunks_loaded": chunks, "doc_id": doc_id})
 
+
+# MCP Tool Registry — araç listesi
+TOOLS = [
+    {
+        "name": "get_weather",
+        "description": "Gets current weather for a given city.",
+        "parameters": {"city": "string"}
+    },
+    {
+        "name": "search_docs",
+        "description": "Searches company documentation.",
+        "parameters": {"query": "string"}
+    }
+]
+
+@app.route('/api/tools', methods=['GET'])
+def get_tools():
+    """MCP benzeri tool registry endpoint."""
+    return jsonify({"tools": TOOLS})
+
 if __name__ == '__main__':
     verify_model_hash()
     run_regression_tests()
