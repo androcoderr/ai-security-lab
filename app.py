@@ -313,6 +313,38 @@ def scan_tool_description(tool):
     
     return True, "Temiz"
 
+
+# Watermark karakterleri — görünmez Unicode
+WATERMARK_PATTERN = [
+    '\u200b',  # Sıfır genişlikli boşluk
+    '\u200c',  # Sıfır genişlikli non-joiner
+    '\u200d',  # Sıfır genişlikli joiner
+]
+
+def add_watermark(text):
+    """Model cevabına görünmez watermark ekle."""
+    words = text.split()
+    watermarked = []
+    pattern_index = 0
+    
+    for i, word in enumerate(words):
+        watermarked.append(word)
+        # Her 8 kelimede bir watermark karakteri ekle
+        if i > 0 and i % 8 == 0:
+            watermarked.append(WATERMARK_PATTERN[pattern_index % len(WATERMARK_PATTERN)])
+            pattern_index += 1
+    
+    return ' '.join(watermarked)
+
+def detect_watermark(text):
+    """Metinde watermark var mı tespit et."""
+    for char in WATERMARK_PATTERN:
+        if char in text:
+            count = text.count(char)
+            print(f"[WATERMARK] Tespit edildi! Karakter: U+{ord(char):04X}, Adet: {count}")
+            return True
+    return False
+
 def detect_fictional_framing(text):
     """Fictional framing + zararlı içerik kombinasyonunu tespit et."""
     text_lower = text.lower()
@@ -544,7 +576,8 @@ User question: {user_message}"""
             log_to_db(user_message, raw_ai_response, "System Prompt Leakage Attempt Blocked", client_ip, user_agent, endpoint)
             raw_ai_response = "🛡️ GÜVENLİK UYARISI: Bu bilgi paylaşılamaz."
 
-        return jsonify({"reply": raw_ai_response})
+        watermarked_response = add_watermark(raw_ai_response)
+        return jsonify({"reply": watermarked_response})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
