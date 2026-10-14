@@ -501,6 +501,49 @@ def check_crescendo(client_ip, message):
         print(f"[CRESCENDO] Hata: {e}")
         return False
 
+
+def check_api_key_rate_limit(api_key):
+    """API key bazlı rate limiting."""
+    if not api_key:
+        return False
+    
+    key = f"ratelimit:apikey:{api_key}"
+    try:
+        count = r.incr(key)
+        if count == 1:
+            r.expire(key, 60)  # 60 saniye
+        
+        if count > 20:  # API key bazlı limit: 60sn/20 istek
+            security_log(
+                "api_key_rate_limit_exceeded",
+                level="WARNING",
+                api_key=api_key[-8:],  # Son 8 karakter
+                count=count
+            )
+            return False
+        return True
+    except Exception as e:
+        return True  # Redis hatasında geçir
+
+def check_endpoint_rate_limit(endpoint, ip):
+    """Endpoint bazlı rate limiting."""
+    # /health endpoint'i için daha yüksek limit
+    if endpoint == '/health':
+        limit = 60  # 60sn/60 istek
+    elif endpoint == '/api/chat':
+        limit = 5   # 60sn/5 istek
+    else:
+        limit = 30  # Default
+
+    key = f"ratelimit:endpoint:{endpoint}:{ip}"
+    try:
+        count = r.incr(key)
+        if count == 1:
+            r.expire(key, 60)
+        return count <= limit
+    except:
+        return True
+
 def check_anomaly(client_ip):
     """Son 5 dakikadaki anomalileri kontrol et."""
     try:
@@ -547,13 +590,20 @@ def chat():
     chat_key = request.headers.get('X-Chat-API-Key', '')
     if CHAT_API_KEY and chat_key != CHAT_API_KEY:
         return jsonify({"error": "Unauthorized"}), 401
+    
+    # API key rate limiting
+    if not check_api_key_rate_limit(chat_key):
+        return jsonify({"reply": "⚠️ API KEY LIMIT AŞILDI: Çok fazla istek attınız."}), 429
+    
+    # Endpoint rate limiting
+    if not check_endpoint_rate_limit(request.path, client_ip):
+        return jsonify({"reply": "⚠️ HIZ SINIRI AŞILDI: Çok fazla istek attınız."}), 429
 
     client_ip = request.remote_addr
     user_agent = request.headers.get('User-Agent', 'unknown')
     endpoint = request.path
     check_anomaly(client_ip)
-    if not check_rate_limit(client_ip):
-        return jsonify({"reply": "⚠️ HIZ SINIRI AŞILDI: Çok fazla istek attınız."}), 429
+
 
     user_message = request.json.get("message", "")
 
