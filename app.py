@@ -208,7 +208,7 @@ def detect_semantic_injection(text, threshold=0.50):
         similarities = util.cos_sim(text_embedding, attack_embeddings)[0]
         max_similarity = float(similarities.max())
         if max_similarity >= threshold:
-            print(f"[SEMANTIC] Injection tespit edildi. Benzerlik: {max_similarity:.2f}")
+            security_log("semantic_injection_detected", level="WARNING", similarity=round(max_similarity, 2))
             return True
         return False
     except Exception as e:
@@ -263,12 +263,12 @@ def detect_training_extraction(text):
     if len(words) > 5:
         unique_ratio = len(set(words)) / len(words)
         if unique_ratio < 0.3:
-            print(f"[EXTRACTION] Tekrar saldirisi tespit edildi. Unique ratio: {unique_ratio:.2f}")
+            security_log("repetition_attack_detected", level="WARNING", unique_ratio=round(unique_ratio, 2))
             return True
     
     # 2. Completion pattern tespiti
     if any(p in text_lower for p in COMPLETION_PATTERNS):
-        print(f"[EXTRACTION] Completion pattern tespit edildi.")
+        security_log("completion_pattern_detected", level="WARNING")
         return True
     
     return False
@@ -343,9 +343,52 @@ def detect_watermark(text):
     for char in WATERMARK_PATTERN:
         if char in text:
             count = text.count(char)
-            print(f"[WATERMARK] Tespit edildi! Karakter: U+{ord(char):04X}, Adet: {count}")
+            security_log("watermark_detected", level="INFO", character=f"U+{ord(char):04X}", count=count)
             return True
     return False
+
+
+import logging
+import json
+
+class JSONFormatter(logging.Formatter):
+    """JSON formatında log formatter."""
+    def format(self, record):
+        log_data = {
+            "timestamp": self.formatTime(record),
+            "level": record.levelname,
+            "message": record.getMessage(),
+        }
+        if hasattr(record, "extra"):
+            log_data.update(record.extra)
+        return json.dumps(log_data, ensure_ascii=False)
+
+# JSON logger kur
+json_logger = logging.getLogger("security")
+json_logger.setLevel(logging.INFO)
+handler = logging.StreamHandler()
+handler.setFormatter(JSONFormatter())
+json_logger.addHandler(handler)
+
+def security_log(event, level="INFO", **kwargs):
+    """Structured security log yaz."""
+    import time
+    extra = {
+        "event": event,
+        "timestamp_unix": time.time(),
+    }
+    extra.update(kwargs)
+    record = logging.LogRecord(
+        name="security",
+        level=getattr(logging, level),
+        pathname="",
+        lineno=0,
+        msg=event,
+        args=(),
+        exc_info=None
+    )
+    record.extra = extra
+    json_logger.handle(record)
 
 def detect_fictional_framing(text):
     """Fictional framing + zararlı içerik kombinasyonunu tespit et."""
@@ -355,7 +398,7 @@ def detect_fictional_framing(text):
     has_harmful = any(h in text_lower for h in HARMFUL_COMBINED)
     
     if has_frame and has_harmful:
-        print(f"[FICTIONAL] Frame + zararlı içerik tespit edildi.")
+        security_log("fictional_framing_detected", level="WARNING")
         return True
     
     return False
@@ -450,7 +493,7 @@ def check_crescendo(client_ip, message):
         cumulative = sum(scores)
         
         if cumulative >= 2.0:
-            print(f"[CRESCENDO] ALERT: {client_ip} kumulatif skor: {cumulative:.2f}")
+            security_log("crescendo_attack_detected", level="WARNING", ip=client_ip, cumulative_score=round(cumulative, 2))
             return True
         
         return False
