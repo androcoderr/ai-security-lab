@@ -740,6 +740,49 @@ Respond to the user message."""
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
+@app.route('/health', methods=['GET'])
+def health_check():
+    """Sistem saglik kontrolu."""
+    import time
+    health = {
+        "status": "healthy",
+        "timestamp": time.time(),
+        "components": {}
+    }
+    
+    # PostgreSQL kontrolu
+    try:
+        conn = psycopg2.connect(host=DB_HOST, user=DB_USER, password=DB_PASS, dbname=DB_NAME)
+        conn.close()
+        health["components"]["database"] = "healthy"
+    except:
+        health["components"]["database"] = "unhealthy"
+        health["status"] = "degraded"
+    
+    # Redis kontrolu
+    try:
+        r.ping()
+        health["components"]["redis"] = "healthy"
+    except:
+        health["components"]["redis"] = "unhealthy"
+        health["status"] = "degraded"
+    
+    # Ollama kontrolu
+    try:
+        response = requests.get("http://ollama:11434/api/tags", timeout=5)
+        if response.status_code == 200:
+            health["components"]["ollama"] = "healthy"
+        else:
+            health["components"]["ollama"] = "unhealthy"
+            health["status"] = "degraded"
+    except:
+        health["components"]["ollama"] = "unhealthy"
+        health["status"] = "degraded"
+    
+    status_code = 200 if health["status"] == "healthy" else 503
+    return jsonify(health), status_code
+
 if __name__ == '__main__':
     verify_model_hash()
     run_regression_tests()
