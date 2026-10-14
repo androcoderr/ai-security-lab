@@ -597,6 +597,9 @@ def check_anomaly(client_ip):
 
 @app.route('/api/chat', methods=['POST'])
 def chat():
+    client_ip = request.remote_addr
+    user_agent = request.headers.get('User-Agent', 'unknown')
+    endpoint = request.path
     # API key kontrolu
     chat_key = request.headers.get('X-Chat-API-Key', '')
     if CHAT_API_KEY and chat_key != CHAT_API_KEY:
@@ -610,9 +613,6 @@ def chat():
     if not check_endpoint_rate_limit(request.path, client_ip):
         return jsonify({"reply": "⚠️ HIZ SINIRI AŞILDI: Çok fazla istek attınız."}), 429
 
-    client_ip = request.remote_addr
-    user_agent = request.headers.get('User-Agent', 'unknown')
-    endpoint = request.path
     check_anomaly(client_ip)
 
 
