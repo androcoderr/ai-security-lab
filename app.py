@@ -209,7 +209,7 @@ def get_semantic_model():
         _attack_embeddings = _semantic_model.encode(KNOWN_ATTACKS)
     return _semantic_model, _attack_embeddings
 
-def detect_semantic_injection(text, threshold=0.50):
+def detect_semantic_injection(text, threshold=0.70):
     """Anlamsal benzerlik ile injection tespiti."""
     try:
         from sentence_transformers import util
