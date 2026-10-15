@@ -558,6 +558,19 @@ def check_endpoint_rate_limit(endpoint, ip):
     except:
         return True
 
+
+def block_ip(ip_address, duration=3600):
+    """IP adresini belirli sure engelle (saniye)."""
+    key = f"blocked:ip:{ip_address}"
+    r.setex(key, duration, "blocked")
+    security_log("ip_blocked", level="WARNING", ip=ip_address, duration=duration)
+    print(f"[IR] IP engellendi: {ip_address} ({duration}sn)")
+
+def is_ip_blocked(ip_address):
+    """IP adresi engellenmiş mi kontrol et."""
+    key = f"blocked:ip:{ip_address}"
+    return r.exists(key)
+
 def check_anomaly(client_ip):
     """Son 5 dakikadaki anomalileri kontrol et."""
     try:
@@ -616,6 +629,8 @@ def chat():
     if not check_endpoint_rate_limit(request.path, client_ip):
         return jsonify({"reply": "⚠️ HIZ SINIRI AŞILDI: Çok fazla istek attınız."}), 429
 
+    if is_ip_blocked(client_ip):
+        return jsonify({"error": "Access denied"}), 403
     check_anomaly(client_ip)
 
 
