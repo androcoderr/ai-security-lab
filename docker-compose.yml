@@ -31,6 +31,19 @@ services:
     networks:
       - lab-net
 
+
+  elasticsearch:
+    image: elasticsearch:8.12.0
+    container_name: hacker-lab-elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    ports:
+      - "9200:9200"
+    networks:
+      - lab-net
+
   backend:
     build: .
     env_file:

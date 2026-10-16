@@ -405,6 +405,28 @@ def security_log(event, level="INFO", **kwargs):
     )
     record.extra = extra
     json_logger.handle(record)
+    log_to_elasticsearch(event, level, **kwargs)
+
+
+import datetime
+
+def log_to_elasticsearch(event, level="INFO", **kwargs):
+    """Guvenlik olayini Elasticsearch'e gonder."""
+    try:
+        import requests as req
+        doc = {
+            "timestamp": datetime.datetime.utcnow().isoformat(),
+            "level": level,
+            "event": event,
+        }
+        doc.update(kwargs)
+        req.post(
+            "http://elasticsearch:9200/ai-security-logs/_doc",
+            json=doc,
+            timeout=2
+        )
+    except Exception:
+        pass  # Elasticsearch yoksa sessizce gec
 
 def detect_fictional_framing(text):
     """Fictional framing + zararlı içerik kombinasyonunu tespit et."""
