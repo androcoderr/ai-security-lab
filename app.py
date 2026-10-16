@@ -690,6 +690,7 @@ def chat():
 
     if detect_prompt_injection(user_message) or detect_semantic_injection(user_message) or detect_fictional_framing(user_message) or detect_training_extraction(user_message):
         log_to_db(user_message, "Blocked before reaching model", "Prompt Injection Attempt", client_ip, user_agent, endpoint)
+        security_log("prompt_injection_blocked", level="WARNING", ip=client_ip, endpoint=endpoint)
         return jsonify({"reply": "🛡️ GÜVENLİK UYARISI: Şüpheli talimat değiştirme girişimi tespit edildi ve engellendi."}), 400
 
     # RAG: ilgili dokuman parcalarini getir
