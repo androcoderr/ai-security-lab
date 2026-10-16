@@ -1,6 +1,7 @@
 import os
 RAG_API_KEY = os.environ.get("RAG_API_KEY", "")
 CHAT_API_KEY = os.environ.get("CHAT_API_KEY", "")
+INTERNAL_API_TOKEN = os.environ.get("INTERNAL_API_TOKEN", "")
 
 DASHBOARD_USER = os.environ.get("DASHBOARD_USER", "admin")
 DASHBOARD_PASS = os.environ.get("DASHBOARD_PASS", "")
@@ -98,7 +99,8 @@ def verify_model_hash():
         import requests as req
         response = req.post(
             "http://ollama:11434/api/show",
-            json={"name": "llama3"}
+            json={"name": "llama3"},
+            headers={"X-Internal-Token": INTERNAL_API_TOKEN}
         )
         model_info = response.json()
         # Hash modelfile icinde FROM satirinda
@@ -681,7 +683,7 @@ User question: {user_message}"""
     }
     
     try:
-        response = requests.post("http://ollama:11434/api/generate", json=ollama_payload)
+        response = requests.post("http://ollama:11434/api/generate", json=ollama_payload, headers={"X-Internal-Token": INTERNAL_API_TOKEN})
         raw_ai_response = response.json().get("response", "")
         
         ai_pii_results = detect_pii(raw_ai_response)
@@ -850,6 +852,7 @@ Respond to the user message."""
         response = requests.post(
             "http://ollama:11434/api/generate",
             json={"model": "llama3", "prompt": prompt, "stream": False},
+            headers={"X-Internal-Token": INTERNAL_API_TOKEN},
             timeout=30
         )
         raw_response = response.json().get("response", "")
@@ -892,7 +895,7 @@ def health_check():
     
     # Ollama kontrolu
     try:
-        response = requests.get("http://ollama:11434/api/tags", timeout=5)
+        response = requests.get("http://ollama:11434/api/tags", headers={"X-Internal-Token": INTERNAL_API_TOKEN}, timeout=5)
         if response.status_code == 200:
             health["components"]["ollama"] = "healthy"
         else:
