@@ -561,6 +561,22 @@ def check_endpoint_rate_limit(endpoint, ip):
         return True
 
 
+
+# Lokal Threat Feed — bilinen zararlı IP listesi
+THREAT_FEED = set([
+    "1.1.1.1",      # Örnek — gerçekte Cloudflare DNS (zararlı değil)
+    "10.0.0.1",     # Örnek — test amaçlı
+    "192.168.100.1", # Örnek — test amaçlı
+])
+
+def check_threat_feed(ip_address):
+    """IP adresini lokal threat feed ile kontrol et."""
+    if ip_address in THREAT_FEED:
+        security_log("threat_feed_match", level="WARNING", ip=ip_address)
+        print(f"[THREAT] Bilinen zararlı IP tespit edildi: {ip_address}")
+        return True
+    return False
+
 def block_ip(ip_address, duration=3600):
     """IP adresini belirli sure engelle (saniye)."""
     key = f"blocked:ip:{ip_address}"
@@ -631,7 +647,7 @@ def chat():
     if not check_endpoint_rate_limit(request.path, client_ip):
         return jsonify({"reply": "⚠️ HIZ SINIRI AŞILDI: Çok fazla istek attınız."}), 429
 
-    if is_ip_blocked(client_ip):
+    if is_ip_blocked(client_ip) or check_threat_feed(client_ip):
         return jsonify({"error": "Access denied"}), 403
     check_anomaly(client_ip)
 
